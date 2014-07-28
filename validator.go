@@ -3,6 +3,7 @@ package data
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 type Validator struct {
@@ -23,7 +24,7 @@ func (v *Validator) HasErrors() bool {
 func (v *Validator) Require(key string, msg ...string) {
 	if val, found := v.data[key]; !found {
 		v.requiredError(key, msg...)
-	} else if val == "" {
+	} else if strings.TrimSpace(val) == "" {
 		v.requiredError(key, msg...)
 	}
 }
