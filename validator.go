@@ -87,24 +87,41 @@ func (v *Validator) lengthRangeError(key string, min int, max int, msg ...string
 	}
 }
 
-func (v *Validator) Match(key string, regex *regexp.Regexp, msg ...string) {
+func (v *Validator) Match(key1 string, key2 string, msg ...string) {
+	val1 := v.data[key1]
+	val2 := v.data[key2]
+	if val1 != val2 {
+		v.matchError(key1, key2, msg...)
+	}
+}
+
+func (v *Validator) matchError(key1 string, key2 string, msg ...string) {
+	if len(msg) != 0 {
+		v.Error(key2, msg[0])
+	} else {
+		err := fmt.Sprintf("%s and %s must match.", key1, key2)
+		v.Error(key2, err)
+	}
+}
+
+func (v *Validator) Pattern(key string, regex *regexp.Regexp, msg ...string) {
 	if val, found := v.data[key]; !found && !regex.MatchString("") {
-		v.matchError(key, msg...)
+		v.patternError(key, msg...)
 	} else if !regex.MatchString(val) {
-		v.matchError(key, msg...)
+		v.patternError(key, msg...)
 	}
 }
 
 func (v *Validator) Email(key string, msg ...string) {
 	regex := regexp.MustCompile("^[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\\w](?:[\\w-]*[\\w])?\\.)+[a-zA-Z0-9](?:[\\w-]*[\\w])?$")
-	v.Match(key, regex, msg...)
+	v.Pattern(key, regex, msg...)
 }
 
-func (v *Validator) matchError(key string, msg ...string) {
+func (v *Validator) patternError(key string, msg ...string) {
 	if len(msg) != 0 {
 		v.Error(key, msg[0])
 	} else {
-		err := fmt.Sprintf("%s was not formatted correctly.", key)
+		err := fmt.Sprintf("%s must be correctly formatted.", key)
 		v.Error(key, err)
 	}
 }

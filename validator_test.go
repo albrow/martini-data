@@ -86,6 +86,24 @@ func TestLengthRange(t *testing.T) {
 
 func TestMatch(t *testing.T) {
 	data := Data(map[string]string{
+		"password":        "password123",
+		"confirmPassword": "password123",
+		"nonMatching":     "password1234",
+	})
+	val := data.Validator()
+	val.Match("password", "confirmPassword")
+	if val.HasErrors() {
+		t.Errorf("Expected no errors but got errors: %v", val.Errors)
+	}
+
+	val.Match("password", "nonMatching")
+	if len(val.Errors) != 1 {
+		t.Error("Expected a validation error.")
+	}
+}
+
+func TestPattern(t *testing.T) {
+	data := Data(map[string]string{
 		"numeric":     "123",
 		"alpha":       "abc",
 		"not-numeric": "123a",
@@ -94,14 +112,14 @@ func TestMatch(t *testing.T) {
 	val := data.Validator()
 	numericRegex := regexp.MustCompile("^[0-9]+$")
 	alphaRegex := regexp.MustCompile("^[a-zA-Z]+$")
-	val.Match("numeric", numericRegex)
-	val.Match("alpha", alphaRegex)
+	val.Pattern("numeric", numericRegex)
+	val.Pattern("alpha", alphaRegex)
 	if val.HasErrors() {
 		t.Errorf("Expected no errors but got errors: %v", val.Errors)
 	}
 
-	val.Match("not-numeric", numericRegex)
-	val.Match("not-alpha", alphaRegex)
+	val.Pattern("not-numeric", numericRegex)
+	val.Pattern("not-alpha", alphaRegex)
 	if len(val.Errors) != 2 {
 		t.Errorf("Expected 2 validation errors but got %d.", len(val.Errors))
 	}
