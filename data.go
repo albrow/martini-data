@@ -64,3 +64,9 @@ func (d Data) GetInt(key string) int {
 func (d Data) GetStrings(key string) []string {
 	return strings.Split(d[key], ",")
 }
+
+func (d Data) Validator() *Validator {
+	return &Validator{
+		data: d,
+	}
+}
