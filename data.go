@@ -65,6 +65,19 @@ func (d Data) GetStrings(key string) []string {
 	return strings.Split(d[key], ",")
 }
 
+func (d Data) GetBool(key string) bool {
+	str, found := d[key]
+	if !found {
+		return false
+	} else {
+		if result, err := strconv.ParseBool(str); err != nil {
+			panic(err)
+		} else {
+			return result
+		}
+	}
+}
+
 func (d Data) Validator() *Validator {
 	return &Validator{
 		data: d,
